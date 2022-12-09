@@ -4,14 +4,10 @@ import * as readlinePromises from "node:readline/promises";
 import { Kage, Polygons } from "@kurgm/kage-engine";
 import * as cliProgress from 'cli-progress'
 
-type Glyph = {
-  name: string;
-  related: string;
-  data: string;
-};
+import { Glyph } from "./types.d";
 
 const dumpFileName = "dump_newest_only.txt";
-const outputDir = "images";
+const outputDir = "images/svg";
 
 const db: Glyph[] = [];
 
@@ -80,7 +76,11 @@ function getContainedGlyphs(
   await genDb();
   console.log("Database generated.");
 
-  const glyphNamePattern = /^dkw-/;
+  const patterns = {
+    "dkw": /^dkw-/,
+    "unicode": /^u[0-9a-f]{5}$/,
+  }
+  const glyphNamePattern = patterns["unicode"];
   const listToGen = db.filter((glyph) => glyphNamePattern.test(glyph.name));
   // console.log(listToGen.length);
 
@@ -93,7 +93,11 @@ function getContainedGlyphs(
     const svg = genSvg(glyph.name);
     if (svg) {
       const filePath = `${outputDir}/${glyph.name}.svg`;
-      await writeFile(filePath, svg);
+      try{
+        await writeFile(filePath, svg);
+      } catch(err){
+        console.error(err);
+      }
     }
   }))
 
