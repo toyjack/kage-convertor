@@ -1,8 +1,10 @@
 import { createReadStream } from "fs";
-import { writeFile} from "fs/promises";
+import { writeFile } from "fs/promises";
+import { writeFileSync } from "fs";
+import { Buffer } from "node:buffer";
 import * as readlinePromises from "node:readline/promises";
 import { Kage, Polygons } from "@kurgm/kage-engine";
-import * as cliProgress from 'cli-progress'
+import * as cliProgress from "cli-progress";
 
 import { Glyph } from "./types.d";
 
@@ -77,29 +79,28 @@ function getContainedGlyphs(
   console.log("Database generated.");
 
   const patterns = {
-    "dkw": /^dkw-/,
-    "unicode": /^u[0-9a-f]{5}$/,
-  }
+    dkw: /^dkw-/,
+    unicode: /^u[0-9a-f]{5}$/,
+  };
   const glyphNamePattern = patterns["unicode"];
   const listToGen = db.filter((glyph) => glyphNamePattern.test(glyph.name));
-  // console.log(listToGen.length);
+  // console.log(listToGen);
 
   const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
   console.log("Generating SVGs...");
   bar.start(listToGen.length, 0);
 
-  await Promise.all(listToGen.map(async (glyph)=>{
+  listToGen.map( (glyph) => {
     bar.increment();
     const svg = genSvg(glyph.name);
+    // console.log(glyph.name, svg);
     if (svg) {
       const filePath = `${outputDir}/${glyph.name}.svg`;
-      try{
-        await writeFile(filePath, svg);
-      } catch(err){
-        console.error(err);
-      }
+      // const svgData = new Uint8Array(Buffer.from(svg));
+      // console.log(svgData);
+      writeFileSync(filePath, svg, { encoding: "utf-8" });
     }
-  }))
+  });
 
   bar.stop();
   console.log("Done.");
