@@ -1,7 +1,14 @@
 dump_newest_only.txt
 /images/*
-!/images/.gitkeep
+!/images/convert_dkw.sh
+!/images/convert_unicode.sh
+!/images/svg
+!/images/svg
+/images/svg/*
+!/images/svg/.gitkeep
 !/.gitkeep
+
+.yarn
 # Created by https://www.toptal.com/developers/gitignore/api/node,windows,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=node,windows,macos
 
